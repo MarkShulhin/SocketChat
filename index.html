@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <title>SocketChat</title>
+    <style>
+        #messages {
+            height: 300px;
+        }
+        .user-name {
+            color: #ff908e;
+        }
+        #textarea {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h1 class="text-center">
+                    SocketChat
+                    <button id="clear" class="btn btn-danger">Clear</button>
+                </h1>
+                <div id="status"></div>
+                <div id="online"></div>
+                <div id="chat">
+                    <input type="text" id="username"
+                           class="form-control" placeholder="Enter name...">
+                    <br>
+                    <div class="card">
+                        <div id="messages" class="card-block">
+
+                        </div>
+                    </div>
+                    <br>
+                    <textarea  class="form-control" id="textarea" placeholder="Enter message..."></textarea>
+                    <input id="sendBtn" type="button" value="Send message" class="btn btn-info btn-block">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
+
+    <script>
+        (function () {
+            const element = function (id) {
+                return document.getElementById(id);
+            };
+
+            // Get elements
+            const status = element('status');
+            const messages = element('messages');
+            const textarea = element('textarea');
+            const username = element('username');
+            const clearBtn = element('clear');
+            const sendBtn = element('sendBtn');
+            const online = element('online');
+
+            // Set default status
+            const statusDefault = status.textContent;
+
+            const setStatus = statusText => {
+                status.textContent = statusText;
+
+                if(statusText !== statusDefault) {
+                    const delay = setTimeout(() => {
+                        setStatus(statusDefault);
+                    }, 4000);
+                }
+            };
+
+            const currentTime = () => new Date().toTimeString().substring(0,8);
+
+            // Connect to Socket.io
+            const socket = io.connect('http://10.17.185.44:4000');
+
+
+            // Check for connection
+            if(socket !== undefined) {
+                console.log('Connected to socket...');
+
+                // Handle output
+                socket.on('output', data => {
+                    if(data.length) {
+                        for(let x = 0; x < data.length; x++) {
+                            // Build out message div
+                            const message = document.createElement('div');
+                            message.setAttribute('class', 'chat-message');
+                            message.innerHTML = `${currentTime()} <span class="user-name">${data[x].name}</span>: ${data[x].message}`;
+                            messages.appendChild(message);
+                            messages.insertBefore(message, messages.firstChild);
+                        }
+                    }
+                });
+
+                // Get status from server
+                socket.on('status', data => {
+                    // get message status
+                    setStatus((typeof data === 'object') ? data.message : data);
+
+                    // if(data.online) {
+                    //     online.textContent = `Current online: ${data.online}`;
+                    // }
+
+
+                    // if status is clear, clear text
+                    if(data.clear) {
+                        textarea.value = '';
+                    }
+                });
+
+                // Handle input
+                textarea.addEventListener('keydown', event => {
+                   if(event.which === 13 && event.shiftKey === false) {
+                        // Emit to server input
+                       socket.emit('input', {
+                           name: username.value,
+                           message: textarea.value
+                       });
+
+                       event.preventDefault();
+                   }
+                });
+
+                sendBtn.addEventListener('click', event => {
+                    // Emit to server input
+                    socket.emit('input', {
+                        name: username.value,
+                        message: textarea.value
+                    });
+
+                    event.preventDefault();
+                });
+
+
+                // Handle Chat Clear
+                clearBtn.addEventListener('click', () => {
+                    socket.emit('clear');
+                });
+
+                // Clear Message
+                socket.on('cleared', () => {
+                    messages.textContent = '';
+                });
+            }
+        })();
+
+    </script>
+</body>
+</html>

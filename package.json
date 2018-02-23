@@ -1,0 +1,15 @@
+{
+  "name": "socketchat",
+  "version": "1.0.0",
+  "description": "Simple chat app using sockets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Mark Shulhin",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.0.2",
+    "socket.io": "^2.0.4"
+  }
+}
