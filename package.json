@@ -9,7 +9,7 @@
   "author": "Mark Shulhin",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^3.0.2",
+    "mongodb": "^3.1.13",
     "socket.io": "^2.0.4"
   }
 }
