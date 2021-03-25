@@ -1,8 +1,9 @@
 const mongo = require('mongodb').MongoClient;
 const client = require('socket.io').listen(4000).sockets;
+require('dotenv').config();
 
 // Connect to mongo
-mongo.connect('mongodb://127.0.0.1/socketchat', function(err, cl) {
+mongo.connect(process.env.DB_URL, { useUnifiedTopology: true } ,function(err, cl) {
     if(err) {
         throw err;
     }

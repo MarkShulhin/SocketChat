@@ -9,7 +9,8 @@
   "author": "Mark Shulhin",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^3.0.2",
-    "socket.io": "^2.0.4"
+    "dotenv": "^8.2.0",
+    "mongodb": "^3.6.5",
+    "socket.io": "^2.4.1"
   }
 }
