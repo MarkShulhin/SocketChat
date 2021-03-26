@@ -78,7 +78,7 @@
             const currentTime = () => new Date().toTimeString().substring(0,8);
 
             // Connect to Socket.io
-            const socket = io.connect('http://10.17.185.44:4000');
+            const socket = io.connect('http://10.17.185.44:4000', { "rejectUnauthorized": true });
 
 
             // Check for connection
