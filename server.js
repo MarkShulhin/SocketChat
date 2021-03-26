@@ -1,5 +1,7 @@
 const mongo = require('mongodb').MongoClient;
 const client = require('socket.io').listen(4000).sockets;
+const express = require('express');
+const path = require('path');
 require('dotenv').config();
 
 // Connect to mongo
@@ -78,3 +80,12 @@ mongo.connect(process.env.DB_URL, { useUnifiedTopology: true } ,function(err, cl
         });
     });
 });
+
+const port = process.env.PORT || 3000;
+const app = express();
+
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+app.listen(port, () => console.log(`socketchat is listening on port ${port}!`));
